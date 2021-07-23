@@ -28,22 +28,26 @@ def api_post():
         sterilise = req['sterilise']
 
         if sterilise == 'false' and animal == 'chien':
-            path = animal + '/croquettesChiensLists/'+age+'/'+size+'.json'
+            path = animal + '/croquettesChiensLists/' + age + '/' + size + '.json'
             dataset = open_file_average(path)
         if sterilise == 'true' and animal == 'chien':
             if size == 'xsmall' or size == 'mini':
-                pathsize = 'adulteXsmallMiniSterilisé'
+                pathsize = 'small'
             elif size == 'maxi' or size == 'geant':
-                pathsize = 'geant'
+                pathsize = 'big'
             else:
                 pathsize = 'medium'
-            path = animal + '/croquettesChiensLists/'+age+'/AdulteSterilisé/'+pathsize+'.json'
+            path = animal + '/croquettesChiensLists/' + 'chiensSterilises/' + age + '/' + pathsize + '.json'
             dataset = open_file_average(path)
-        print(dataset)
 
+        averageCostToy = toyDog(animal, size)
         foods = calcul_average_price_dog_food(dataset, size)
-        print(foods)
-        return jsonify(foods=foods, animal=animal, size=size, age=age, sterilise=sterilise)
+        averageCostLeashCollar = leashCost(animal)
+        healthCostDog = HealthCost(animal)
+
+        return jsonify(foods=foods, averageCostToy=averageCostToy, healthCostDog=healthCostDog, averageCostLeashCollar=averageCostLeashCollar,
+                       animal=animal, size=size, age=age,
+                       sterilise=sterilise)
 
 
 def open_file_average(path):
@@ -53,23 +57,51 @@ def open_file_average(path):
         return data
 
 
+def HealthCost(animal):
+    if animal == 'chien':
+        dataHealthCost = open_file_average('chien/entretienAntiparasitaireChiens.json')
+    healthCostDog = sum(dataHealthCost) / len(dataHealthCost)
+    return healthCostDog
+
+
+def leashCost(animal):
+    if animal == 'chien':
+        dataLeash = open_file_average('chien/laisseColliersChiens/laisseChiens.json')
+        dataCollar = open_file_average('chien/laisseColliersChiens/colliersChiens.json')
+    averageCostLeashCollar = (sum(dataLeash) / len(dataLeash) + (sum(dataCollar) / len(dataCollar)))
+    return averageCostLeashCollar
+
+
+def toyDog(animal, size):
+    if animal == 'chien':
+        if size == 'xsmall' or size == 'mini':
+            pathsize = 'small'
+        elif size == 'maxi' or size == 'geant':
+            pathsize = 'big'
+        else:
+            pathsize = 'medium'
+        dataToy = open_file_average('chien/jouetsChiensLists/' + pathsize + '.json')
+    averageCostToy = sum(dataToy) / len(dataToy)
+    return averageCostToy
+
+
 def calcul_average_price_dog_food(dataset, size):
     xsmall_quantity = 0.115
     mini_quantity = 0.135
     medium_quantity = 0.230
     maxi_quantity = 0.350
     giant_quantity = 0.400
-    average = (sum(dataset)/len(dataset))
+    average = (sum(dataset) / len(dataset))
     if size == 'xsmall':
-        monthly_price = (average/mini_quantity)*30
+        monthly_price = (average * mini_quantity) * 30
     elif size == 'mini':
-        monthly_price = (average / xsmall_quantity) * 30
+        monthly_price = (average * xsmall_quantity) * 30
     elif size == 'medium':
-        monthly_price = (average / medium_quantity) * 30
+        monthly_price = (average * medium_quantity) * 30
     elif size == 'maxi':
-        monthly_price = (average / maxi_quantity) * 30
+        monthly_price = (average * maxi_quantity) * 30
     elif size == 'geant':
-        monthly_price = (average / giant_quantity) * 30
+        monthly_price = (average * giant_quantity) * 30
     return monthly_price
 
 
