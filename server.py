@@ -41,7 +41,7 @@ def api_post():
             dataset = open_file_average(path)
         print(dataset)
 
-        foods = calcul_average_price(dataset)
+        foods = calcul_average_price_dog_food(dataset, size)
         print(foods)
         return jsonify(foods=foods, animal=animal, size=size, age=age, sterilise=sterilise)
 
@@ -53,19 +53,24 @@ def open_file_average(path):
         return data
 
 
-def calcul_average_price_dog(dataset, size):
+def calcul_average_price_dog_food(dataset, size):
     xsmall_quantity = 0.115
     mini_quantity = 0.135
     medium_quantity = 0.230
     maxi_quantity = 0.350
     giant_quantity = 0.400
     average = (sum(dataset)/len(dataset))
-    if (size == 'xsmall'):
-        monthly_price = (average/xsmall_quantity)*30
-    elif (size == 'mini'):
+    if size == 'xsmall':
+        monthly_price = (average/mini_quantity)*30
+    elif size == 'mini':
         monthly_price = (average / xsmall_quantity) * 30
-
-    return average
+    elif size == 'medium':
+        monthly_price = (average / medium_quantity) * 30
+    elif size == 'maxi':
+        monthly_price = (average / maxi_quantity) * 30
+    elif size == 'geant':
+        monthly_price = (average / giant_quantity) * 30
+    return monthly_price
 
 
 def write_to_file(data):
