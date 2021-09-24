@@ -3,7 +3,7 @@ import os
 
 from flask import Flask, render_template, request, redirect, jsonify, json
 import csv
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
